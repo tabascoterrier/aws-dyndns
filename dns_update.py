@@ -5,9 +5,10 @@ import argparse
 
 
 class AWSDynDns(object):
-    def __init__(self, region, domain, subdomain, hosted_zone_id):
+    def __init__(self, region, domain, subdomain, hosted_zone_id, profile_name):
         self.ip_service = "http://httpbin.org/ip"
-        self.client = boto3.client('route53')
+        session = boto3.Session(profile_name=profile_name)
+        self.client = session.client('route53')
         self.domain = domain
         self.subdomain = subdomain
         self.hosted_zone_id = hosted_zone_id
@@ -105,7 +106,13 @@ if __name__ == "__main__":
         required=True
     )
 
+    parser.add_argument(
+        "--profile", "-p",
+        help="AWS credential profile",
+        required=True
+    )
+
     args = parser.parse_args()
 
-    run = AWSDynDns(args.region, args.domain, args.subdomain, args.zone)
+    run = AWSDynDns(args.region, args.domain, args.subdomain, args.zone, args.profile)
     run.update_record()
