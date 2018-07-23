@@ -5,12 +5,13 @@ import argparse
 
 
 class AWSDynDns(object):
-    def __init__(self, domain, subdomain, hosted_zone_id, profile_name):
+    def __init__(self, domain, subdomain, hosted_zone_id, profile_name, ttl):
         self.ip_service = "http://httpbin.org/ip"
         session = boto3.Session(profile_name=profile_name)
         self.client = session.client('route53')
         self.domain = domain
         self.subdomain = subdomain
+        self.ttl = ttl
         self.hosted_zone_id = hosted_zone_id
         if self.subdomain:
             self.fqdn = "{0}.{1}".format(self.subdomain, self.domain)
@@ -64,7 +65,7 @@ class AWSDynDns(object):
                             'ResourceRecordSet': {
                                 'Name': self.fqdn,
                                 'Type': 'A',
-                                'TTL': 123,
+                                'TTL': self.ttl,
                                 'ResourceRecords': [
                                     {
                                         'Value': self.external_ip
@@ -105,7 +106,15 @@ if __name__ == "__main__":
         required=True
     )
 
+    parser.add_argument(
+        "--ttl",
+        help="Record TTL",
+        required=False,
+        default=300
+
+    )
+
     args = parser.parse_args()
 
-    run = AWSDynDns(args.domain, args.subdomain, args.zone, args.profile)
+    run = AWSDynDns(args.domain, args.subdomain, args.zone, args.profile, args.ttl)
     run.update_record()
