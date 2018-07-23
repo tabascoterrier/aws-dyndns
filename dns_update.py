@@ -5,7 +5,7 @@ import argparse
 
 
 class AWSDynDns(object):
-    def __init__(self, region, domain, subdomain, hosted_zone_id, profile_name):
+    def __init__(self, domain, subdomain, hosted_zone_id, profile_name):
         self.ip_service = "http://httpbin.org/ip"
         session = boto3.Session(profile_name=profile_name)
         self.client = session.client('route53')
@@ -82,13 +82,6 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Manage a dynamic home IP address with an AWS hosted route53 domain")
 
     parser.add_argument(
-        "--region", "-r",
-        default="eu-west-1",
-        help="AWS region to connect to",
-        required=False
-    )
-
-    parser.add_argument(
         "--domain", "-d",
         help="Domain to modify",
         required=True
@@ -114,5 +107,5 @@ if __name__ == "__main__":
 
     args = parser.parse_args()
 
-    run = AWSDynDns(args.region, args.domain, args.subdomain, args.zone, args.profile)
+    run = AWSDynDns(args.domain, args.subdomain, args.zone, args.profile)
     run.update_record()
