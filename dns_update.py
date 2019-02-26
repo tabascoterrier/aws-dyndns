@@ -6,7 +6,7 @@ import argparse
 
 class AWSDynDns(object):
     def __init__(self, domain, record, hosted_zone_id, profile_name, ttl):
-        self.ip_service = "http://httpbin.org/ip"
+        self.ip_service = "https://api.ipify.org/"
         session = boto3.Session(profile_name=profile_name)
         self.client = session.client('route53')
         self.domain = domain
@@ -20,8 +20,7 @@ class AWSDynDns(object):
 
     def get_external_ip(self):
         try:
-            self.external_ip_request = urllib.request.urlopen(self.ip_service).read()
-            self.external_ip = json.loads(self.external_ip_request)['origin']
+            self.external_ip = urllib.request.urlopen(self.ip_service).read().decode()
             print("Found external IP: {0}".format(self.external_ip))
         except Exception as e:
             raise Exception("error getting external IP")
